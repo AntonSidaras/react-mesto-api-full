@@ -7,7 +7,7 @@ module.exports.getCards = (req, res, next) => {
   Cards.find({})
     .populate('owner')
     .then((cards) => {
-      res.status(200).send({ data: cards });
+      res.status(200).send(cards);
     })
     .catch(next);
 };
