@@ -1,0 +1,26 @@
+.header__extra{
+  display: none;
+  width: 24px;
+  height: 21px;
+  margin: 0;
+  margin-top: 6px;
+  padding: 0;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center;
+  background: url("../../../images/header/Extra.svg");
+  border: none;
+  outline: none;
+  color: white;
+  opacity: 1;
+  transition: opacity 0.1s ease;
+}
+.header__extra:hover{
+  cursor: pointer;
+  opacity: 0.6;
+}
+@media screen and (max-width: 940px) {
+  .header__extra{
+    display: block;
+  }
+}

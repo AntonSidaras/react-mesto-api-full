@@ -1,0 +1,24 @@
+.auth__input{
+  margin: 30px auto 0 auto;
+  padding: 0 0 13px 0;
+  width: 100%;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 17px;
+  box-sizing: border-box;
+  font-family: inherit;
+  outline: none;
+  border: none;
+  background-color: transparent;
+  color: #CCCCCC;
+  border-bottom: 2px solid #CCCCCC;
+}
+.auth__input::placeholder{
+  color: #CCCCCC;
+}
+@media screen and (max-width: 645px) {
+  .auth__input{
+    max-width: 280px;
+  }
+}

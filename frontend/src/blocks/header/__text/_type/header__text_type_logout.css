@@ -1,0 +1,29 @@
+.header__text_type_logout{
+  width: 56px;
+  height: 22px;
+  margin: 0;
+  margin-top: 6px;
+  padding: 0;
+  margin-left: 24px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center;
+  border: none;
+  outline: none;
+  color: #A9A9A9;
+  opacity: 1;
+  transition: opacity 0.1s ease;
+}
+.header__text_type_logout:hover{
+  cursor: pointer;
+  opacity: 0.6;
+}
+@media screen and (max-width: 940px) {
+  .header__text_type_logout{
+    align-self: center;
+    margin: 0;
+    margin-bottom: 40px;
+    font-size: 18px;
+    line-height: 22px;
+  }
+}

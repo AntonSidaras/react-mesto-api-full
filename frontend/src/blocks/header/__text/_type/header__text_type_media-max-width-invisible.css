@@ -1,0 +1,5 @@
+@media screen and (max-width: 940px) {
+  .header__text_type_media-max-width-invisible{
+    display: none;
+  }
+}

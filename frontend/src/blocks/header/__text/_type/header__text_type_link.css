@@ -1,0 +1,9 @@
+.header__text_type_link{
+  text-decoration: none;
+  opacity: 1;
+  transition: opacity 0.1s ease;
+}
+.header__text_type_link:hover{
+  cursor: pointer;
+  opacity: 0.6;
+}

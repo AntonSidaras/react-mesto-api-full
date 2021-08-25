@@ -1,0 +1,5 @@
+@media screen and (min-width: 940px) {
+  .header__text_type_media-min-width-invisible{
+    display: none;
+  }
+}

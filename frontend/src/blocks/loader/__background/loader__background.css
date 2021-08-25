@@ -1,0 +1,9 @@
+.loader__background{
+  width: 64px;
+  height: 64px;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  box-sizing: border-box;
+  overflow: hidden;
+}

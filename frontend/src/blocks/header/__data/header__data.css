@@ -1,0 +1,11 @@
+.header__data{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+}
+@media screen and (max-width: 940px) {
+  .header__data{
+    margin-right: 30px;
+  }
+}

@@ -1,0 +1,8 @@
+@media screen and (max-width: 940px) {
+  .header__extra_opened{
+    background: url("../../../../images/popup/close-small.svg");
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+}

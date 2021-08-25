@@ -1,0 +1,9 @@
+.auth{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 60px auto 0 auto;
+  padding: 0;
+  max-width: 358px;
+  min-width: 260px;
+}

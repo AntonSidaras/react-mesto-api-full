@@ -1,0 +1,14 @@
+.header{
+  margin: 45px auto 0 auto;
+  max-width: 880px;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  box-sizing: border-box;
+}
+@media screen and (max-width: 940px) {
+  .header{
+    margin: 28px auto 0 auto;
+  }
+}
