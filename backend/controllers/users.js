@@ -6,6 +6,9 @@ const BadRequest = require('../errors/bad-request');
 const NotFound = require('../errors/not-found');
 const Conflict = require('../errors/conflict');
 
+const { NODE_ENV, JWT_SECRET } = process.env;
+const secretKeyDev = 'secret';
+
 function findUserById(id, res, next) {
   User.findById(id)
     .orFail(() => {
@@ -122,7 +125,7 @@ module.exports.login = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
-        'secret',
+        NODE_ENV === 'production' ? JWT_SECRET : secretKeyDev,
         { expiresIn: '7d' },
       );
       res.status(200).send({ token });

@@ -1,13 +1,19 @@
 const { PORT = 3000 } = process.env;
 
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
+const cors = require('cors');
 const auth = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { login, createUser } = require('./controllers/users');
 const { signInSchema, signUpSchema } = require('./schemas/auth');
 const NotFound = require('./errors/not-found');
+
+const allowedOrigins = ['http://localhost:3000',
+  'http://asidaras.mesto.nomoredomains.club',
+  'https://asidaras.mesto.nomoredomains.club'];
 
 const app = express();
 
@@ -22,6 +28,25 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 });
 
 app.use(requestLogger);
+
+app.use(cors({
+  origin(origin, callback) {
+    // allow requests with no origin
+    // (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+}));
+
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
 
 app.post('/signin', signInSchema, login);
 app.post('/signup', signUpSchema, createUser);
