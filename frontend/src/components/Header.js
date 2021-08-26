@@ -1,9 +1,11 @@
 import logo from "../images/header/logo.svg";
 import React from 'react';
 import { Link } from 'react-router-dom';
+import {CurrentUserContext} from '../contexts/CurrentUserContext';
 
 function Header({data, onSignOut}) {
 
+  const user = React.useContext(CurrentUserContext);
   const [isViewExtra, setisViewExtra] = React.useState(false);
 
   function toggleViewExtra(){
@@ -17,9 +19,9 @@ function Header({data, onSignOut}) {
   return (
     <header className={`header`}>
       <div className="header__top">{
-        isViewExtra === true && data.email !== "" && 
+        isViewExtra === true && data.showEmail === true && 
           <span 
-            className="header__text header__text_type_email header__text_type_media-min-width-invisible">{data.email}
+            className="header__text header__text_type_email header__text_type_media-min-width-invisible">{user.currentUser.email}
           </span>
       }{
         isViewExtra === true && data.button !== "" && 
@@ -36,8 +38,8 @@ function Header({data, onSignOut}) {
             data.link !== "" && 
             <Link className="header__text header__text_type_link" to={data.link}>{data.text}</Link>
           }{
-            data.email !== "" && 
-            <span className="header__text header__text_type_media-max-width-invisible">{data.email}</span>
+            data.showEmail === true && 
+            <span className="header__text header__text_type_media-max-width-invisible">{user.currentUser.email}</span>
           }{
             data.button !== "" && 
             <button 
@@ -46,7 +48,7 @@ function Header({data, onSignOut}) {
               onClick={handleClick}>{data.button}
             </button>
           }{
-            data.button !== "" && data.email !== "" && 
+            data.button !== "" && data.showEmail === true && 
               <button 
                 type="button" 
                 className={`header__extra ${isViewExtra ? "header__extra_opened" : ""}`}

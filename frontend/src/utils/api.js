@@ -1,31 +1,69 @@
 class Api {
-  constructor({server, token, cohort, handleResponse}) {
+  constructor({server,handleResponse}) {
     this._server = server;
-    this._token = token;
-    this._cohort = cohort;
     this._handleResponse = handleResponse;
-    this._url = this._server + "/v1/" + this._cohort;
-    this._userStr = "/users/me";
-    this._cardStr = "/cards";
-    this._likes = "/cards/likes/";
+    this._signIn = "/signin"; //вход
+    this._signUp = "/signup"; //регистрация
+    this._usersMe = "/users/me";
     this._avatar = "/users/me/avatar";
+    this._cards = "/cards";
+    this._likes = "/likes";
     this._contentType = "application/json";
   }
 
-  getUserInfo() {
-    return fetch(this._url + this._userStr, {
+  signUp({email, password}){
+    return fetch(this._server + this._signUp, {
+      method: "POST",
       headers: {
-        authorization: this._token
+        "Content-Type": this._contentType
+      },
+      body: JSON.stringify({
+        "password": password,
+        "email": email
+      })
+    })
+    .then(this._handleResponse);
+  }
+  
+  signIn({email, password}){
+    return fetch(this._server + this._signIn, {
+      method: "POST",
+      headers: {
+        "Content-Type": this._contentType
+      },
+      body: JSON.stringify({
+        "password": password,
+        "email": email
+      })
+    })
+    .then(this._handleResponse);
+  }
+
+  checkUser(jwt){
+    return fetch(this._server + this._usersMe, {
+      method: "GET",
+      headers: {
+        "Content-Type": this._contentType,
+        "Authorization" : `Bearer ${jwt}`
       }
     })
     .then(this._handleResponse);
   }
 
-  setUserInfo({newName, newAbout}){
-    return fetch(this._url + this._userStr, {
+  getUserInfo(jwt) {
+    return fetch(this._server + this._usersMe, {
+      headers: {
+        "Authorization" : `Bearer ${jwt}`
+      }
+    })
+    .then(this._handleResponse);
+  }
+
+  setUserInfo(jwt, {newName, newAbout}){
+    return fetch(this._server + this._usersMe, {
       method: "PATCH",
       headers: {
-        authorization: this._token,
+        "Authorization" : `Bearer ${jwt}`,
         "Content-Type": this._contentType
       },
       body: JSON.stringify({
@@ -36,20 +74,25 @@ class Api {
     .then(this._handleResponse);
   }
 
-  getInitialCards() {
-    return fetch(this._url + this._cardStr, {
+  setUserAvatar(jwt, userAvatar){
+    return fetch(this._server + this._avatar, {
+      method: "PATCH",
       headers: {
-        authorization: this._token
-      }
+        "Authorization" : `Bearer ${jwt}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        avatar: userAvatar
+      })
     })
     .then(this._handleResponse);
   }
 
-  createNewCard({newTitle, newLink}){
-    return fetch(this._url + this._cardStr, {
+  createNewCard(jwt, {newTitle, newLink}){
+    return fetch(this._server + this._cards, {
       method: "POST",
       headers: {
-        authorization: this._token,
+        "Authorization" : `Bearer ${jwt}`,
         "Content-Type": this._contentType
       },
       body: JSON.stringify({
@@ -60,55 +103,48 @@ class Api {
     .then(this._handleResponse);
   }
 
-  removeCard(cardId){
-    return fetch(this._url + this._cardStr + "/" + cardId, {
-      method: "DELETE",
+  getCards(jwt) {
+    return fetch(this._server + this._cards, {
       headers: {
-        authorization: this._token,
+        "Authorization" : `Bearer ${jwt}`
       }
     })
     .then(this._handleResponse);
   }
 
-  likeCard(cardId){
-    return fetch(this._url + this._likes + cardId, {
+  likeCard(jwt, cardId){
+    return fetch(this._server + this._cards + "/" + cardId + this._likes, {
       method: "PUT",
       headers: {
-        authorization: this._token,
+        "Authorization" : `Bearer ${jwt}`,
       }
     })
     .then(this._handleResponse);
   }
 
-  dislikeCard(cardId){
-    return fetch(this._url + this._likes + cardId, {
+  dislikeCard(jwt, cardId){
+    return fetch(this._server + this._cards + "/" + cardId + this._likes, {
       method: "DELETE",
       headers: {
-        authorization: this._token,
+        "Authorization" : `Bearer ${jwt}`,
       }
     })
     .then(this._handleResponse);
   }
 
-  updateAvatar(userAvatar){
-    return fetch(this._url +  this._avatar, {
-      method: "PATCH",
+  removeCard(jwt, cardId){
+    return fetch(this._server + this._cards + "/" + cardId, {
+      method: "DELETE",
       headers: {
-        authorization: this._token,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        avatar: userAvatar
-      })
+        "Authorization" : `Bearer ${jwt}`
+      }
     })
     .then(this._handleResponse);
   }
 
 }
 
-//token: "0551bbe7-cdc8-4608-8c2f-7d3f66eebc6e", cohort: "cohort-24"
-//token: "353f5b3a-f1c1-4e51-8411-778e0e42b67e", cohort: "cohort-22"
-export default new Api({server: "https://mesto.nomoreparties.co", token: "353f5b3a-f1c1-4e51-8411-778e0e42b67e", cohort: "cohort-22", handleResponse: (res) => {
+export default new Api({server: "https://api.asidaras.mesto.nomoredomains.monster", handleResponse: (res) => {
   if (!res.ok) {
     return Promise.reject(`Ошибка: ${res.status}`);
   }

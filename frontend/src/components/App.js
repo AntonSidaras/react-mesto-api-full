@@ -1,5 +1,5 @@
 import React from "react";
-import {BrowserRouter, Route, Redirect, Switch, useHistory} from 'react-router-dom';
+import {BrowserRouter, Route, Redirect, Switch} from 'react-router-dom';
 import ProtectedRoute from "./ProtectedRoute";
 import Header from "./Header";
 import Login from "./Login";
@@ -14,8 +14,7 @@ import AddPlacePopup from "./AddPlacePopup";
 import ImagePopup from "./ImagePopup";
 import Loader from "./Loader";
 import PageNotFound from "./PageNotFound";
-import Api from "../utils/api";
-import Auth from '../utils/auth';
+import Api from '../utils/api';
 import onLoadImage from "../images/profile/Card-load.gif"
 import onSuccessAuth from "../images/popup/ok.svg"
 import onFailureAuth from "../images/popup/fail.svg"
@@ -27,10 +26,8 @@ function App() {
   const toolTipDataFail = {image: onFailureAuth, text:"Что-то пошло не так! Попробуйте ещё раз."};
   const toolTipDataSuccess = {image: onSuccessAuth, text:"Вы успешно зарегистрировались!"};
 
-  const history = useHistory();
-
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-  const [userEmail, setUserEmail] = React.useState("example@example.com");
+  const [jwt, setJWT] = React.useState(null);
 
   const [isInfoTooltipPopupOpen, setisInfoTooltipPopupOpen] = React.useState(false);
   const [toolTipData, setToolTipData] = React.useState(toolTipDataFail);
@@ -41,38 +38,38 @@ function App() {
   const [selectedCard, setSelectedCard] = React.useState(null);
   const [cardToDelete, setCardToDelete] = React.useState(null);
   const [buttonCaption, setButtonCaption] = React.useState(buttonCaptionDefault);
-  const [currentUser, setCurrentUser] = React.useState({name: "Идёт загрузка...", avatar: onLoadImage, about: "", _id: 0});
+  const [currentUser, setCurrentUser] = React.useState({name: "Идёт загрузка...", avatar: onLoadImage, about: "", email: "example@example.com", _id: 0});
   const [cards, setCards] = React.useState([]);
 
   React.useEffect(() => {
 
-    const jwt = localStorage.getItem('token');
+    setJWT(localStorage.getItem('token'));
 
-    Auth.checkUser(jwt)
+    Api.checkUser(jwt)
     .then((user) => {
-      console.log(user);
       if(user._id && user.email){
-        setUserEmail(user.email);
         setIsLoggedIn(true);
+        loadPage(jwt);
       }
     })
     .catch((error) => {
-      alert(error);
+      console.log(error);
     });
+  }, [jwt]);
 
-    Promise.all([Api.getUserInfo(), Auth.getCards(jwt)])
+  function loadPage(jwt){
+    Promise.all([Api.getUserInfo(jwt), Api.getCards(jwt)])
     .then(([userData, cards]) => {
       setCurrentUser(userData);
       setCards(cards);
     })
     .catch(([userDataError, cardsError]) => {
-      alert(userDataError);
-      alert(cardsError);
+      console.log(userDataError, cardsError);
     })
     .finally(()=>{
       setLoaderVisible(false);
     });
-  }, []);
+  }
 
   function toggleLogin(){
     isLoggedIn ? onSignOut(false) : setIsLoggedIn(true);
@@ -80,6 +77,7 @@ function App() {
 
   function onSignOut(value){
     localStorage.removeItem('token');
+    setJWT("");
     setIsLoggedIn(value);
     closeAllPopups();
   }
@@ -117,7 +115,7 @@ function App() {
     const isLiked = card.likes.some(i => i._id === currentUser._id);
 
     if(isLiked){
-      Api.dislikeCard(card._id)
+      Api.dislikeCard(jwt, card._id)
       .then((result) => {
         setCards((state) => state.map((c) => c._id === card._id ? result : c));
       })
@@ -126,7 +124,7 @@ function App() {
       });
     }
     else{
-      Api.likeCard(card._id)
+      Api.likeCard(jwt, card._id)
       .then((result) => {
         setCards((state) => state.map((c) => c._id === card._id ? result : c));
       })
@@ -138,7 +136,7 @@ function App() {
 
   function handleUpdateUser({name, about}){
     setButtonCaption({add: "Создать", delete: "Да", others: "Сохранение..."});
-    Api.setUserInfo({
+    Api.setUserInfo(jwt, {
       newName: name, 
       newAbout: about
     })
@@ -156,7 +154,7 @@ function App() {
 
   function handleUpdateAvatar({avatar}){
     setButtonCaption({add: "Создать", delete: "Да", others: "Сохранение..."});
-    Api.updateAvatar(avatar)
+    Api.setUserAvatar(jwt, avatar)
     .then((result) => {
       setCurrentUser(result);
       closeAllPopups();
@@ -171,7 +169,7 @@ function App() {
 
   function handleAddPlaceSubmit({title, link}){
     setButtonCaption({add: "Сохранение...", delete: "Да", others: "Сохранить"});
-    Api.createNewCard({
+    Api.createNewCard(jwt, {
       newTitle: title,
       newLink: link
     })
@@ -189,7 +187,7 @@ function App() {
 
   function handleDelete(card){
     setButtonCaption({add: "Создать", delete: "Удаление...", others: "Сохранить"});
-    Api.removeCard(card._id)
+    Api.removeCard(jwt, card._id)
     .then(() => {
       setCards((state) => state.filter(c => c._id !== card._id));
       closeAllPopups();
@@ -203,15 +201,15 @@ function App() {
   }
 
   function onLogin({email, password}){
-    Auth.signIn({
+    Api.signIn({
       email: email, 
       password: password
     })
     .then((response) => {
       localStorage.setItem('token', response.token);
-      setUserEmail(email);
+      setJWT(response.token);
       toggleLogin();
-      history.push("/");
+      loadPage(jwt);
     })
     .catch(() => {
       setToolTipData(toolTipDataFail);
@@ -220,7 +218,7 @@ function App() {
   }
 
   function onRegister({email, password}){
-    Auth.signUp({
+    Api.signUp({
       email: email, 
       password: password
     })
@@ -239,7 +237,7 @@ function App() {
       <div className="page page__content">
         <CurrentUserContext.Provider value={{currentUser: currentUser, isloggedIn: isLoggedIn, handleLogin: toggleLogin}}>
           <ProtectedRoute 
-            exact path='/' component={Header} data={{email: userEmail, text: "", link: "", button: "Выйти"}} onSignOut={toggleLogin}
+            exact path='/' component={Header} data={{showEmail: true, text: "", link: "", button: "Выйти"}} onSignOut={toggleLogin}
           />
           <ProtectedRoute 
             exact path='/' component={Main}
@@ -281,13 +279,13 @@ function App() {
           <Switch>
             <Route exact path="/sign-in">
               {isLoggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
-              <Header data={{email: "", text:"Регистрация", link: "/sign-up", button: ""}}/>
+              <Header data={{showEmail: false, text:"Регистрация", link: "/sign-up", button: ""}}/>
               <Login onLogin={onLogin}/>
               <InfoTooltip isOpen={isInfoTooltipPopupOpen} data={toolTipData} onClose={closeAllPopups}/>
             </Route>
             <Route exact path="/sign-up">
               {isLoggedIn ? <Redirect to="/" /> : <Redirect to="/sign-up" />}
-              <Header data={{email: "", text:"Войти", link: "/sign-in", button: ""}}/>
+              <Header data={{showEmail: false, text:"Войти", link: "/sign-in", button: ""}}/>
               <Register onRegister={onRegister}/>
               <InfoTooltip isOpen={isInfoTooltipPopupOpen} data={toolTipData} onClose={closeAllPopups}/>
             </Route>
