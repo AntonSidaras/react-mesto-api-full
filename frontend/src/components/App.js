@@ -49,22 +49,18 @@ function App() {
     const jwt = localStorage.getItem('token');
 
     Auth.checkUser(jwt)
-    .then((tokenCkeck) => {
-      if(tokenCkeck.data._id && tokenCkeck.data.email){
-        setUserEmail(tokenCkeck.data.email);
+    .then((user) => {
+      console.log(user);
+      if(user._id && user.email){
+        setUserEmail(user.email);
         setIsLoggedIn(true);
       }
     })
     .catch((error) => {
-      if(error.split(" ")[1] === "401"){
-        return;
-      }
-      else{
-        alert(error);
-      }
+      alert(error);
     });
 
-    Promise.all([Api.getUserInfo(), Api.getInitialCards()])
+    Promise.all([Api.getUserInfo(), Auth.getCards(jwt)])
     .then(([userData, cards]) => {
       setCurrentUser(userData);
       setCards(cards);

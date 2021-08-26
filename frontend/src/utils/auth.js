@@ -5,6 +5,7 @@ class Auth {
     this._signIn = "/signin"; //вход
     this._signUp = "/signup"; //регистрация
     this._usersMe = "/users/me";
+    this._cards = "/cards"
     this._contentType = "application/json";
   }
 
@@ -47,11 +48,25 @@ class Auth {
     .then(this._handleResponse);
   }
 
+  getCards(jwt) {
+    return fetch(this._server + this._cards, {
+      headers: {
+        "Authorization" : `Bearer ${jwt}`
+      }
+    })
+    .then(this._handleResponse);
+  }
+
 }
 
-export default new Auth({server: "https://auth.nomoreparties.co", handleResponse: (res) => {
+export default new Auth({server: "https://api.asidaras.mesto.nomoredomains.monster", handleResponse: (res) => {
   if (!res.ok) {
     return Promise.reject(`Ошибка: ${res.status}`);
   }
   return res.json();
 }});
+
+/*
+legacy
+https://auth.nomoreparties.co
+*/
