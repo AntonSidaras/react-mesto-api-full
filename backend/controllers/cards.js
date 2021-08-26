@@ -18,7 +18,7 @@ module.exports.createCard = (req, res, next) => {
 
   Cards.create({ name, link, owner })
     .then((card) => {
-      res.status(200).send({ data: card });
+      res.status(200).send(card);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -69,11 +69,12 @@ module.exports.likeCardById = (req, res, next) => {
     { $addToSet: { likes: userId } },
     { new: true, runValidators: true },
   )
+    .populate('likes')
     .orFail(() => {
       next(new NotFound('Нет карточки с таким _id'));
     })
     .then((card) => {
-      res.status(200).send({ data: card });
+      res.status(200).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
@@ -92,11 +93,12 @@ module.exports.dislikeCardById = (req, res, next) => {
     { $pull: { likes: userId } },
     { new: true, runValidators: true },
   )
+    .populate('likes')
     .orFail(() => {
       next(new NotFound('Нет карточки с таким _id'));
     })
     .then((card) => {
-      res.status(200).send({ data: card });
+      res.status(200).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {

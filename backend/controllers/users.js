@@ -15,7 +15,7 @@ function findUserById(id, res, next) {
       next(new NotFound('Нет пользователя с таким _id'));
     })
     .then((user) => {
-      res.status(200).send({ data: user });
+      res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -85,7 +85,7 @@ module.exports.updateProfile = (req, res, next) => {
       next(new NotFound('Нет пользователя с таким _id'));
     })
     .then((user) => {
-      res.status(200).send({ data: user });
+      res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
@@ -108,7 +108,7 @@ module.exports.updateAvatar = (req, res, next) => {
       next(new NotFound('Нет пользователя с таким _id'));
     })
     .then((user) => {
-      res.status(200).send({ data: user });
+      res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
