@@ -28,7 +28,7 @@ function findUserById(id, res, next) {
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => {
-      res.status(200).send({ data: users });
+      res.status(200).send(users);
     })
     .catch(next);
 };
