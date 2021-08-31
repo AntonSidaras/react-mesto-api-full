@@ -26,8 +26,10 @@ mongoose.connect(NODE_ENV === 'production' ? atlasURI : 'mongodb://localhost:270
   useCreateIndex: true,
   useFindAndModify: false,
   useUnifiedTopology: true,
-}).catch((err) => {
-  throw new Error(err.message);
+}).catch(() => {
+  setTimeout(() => {
+    throw new Error('Ошибка соединения с базой');
+  }, 0);
 });
 
 app.use(requestLogger);

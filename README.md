@@ -1,12 +1,12 @@
-# Проект 15: Mesto фронтенд + бэкенд
+# Project №15: Mesto frontend + backend
 
-## Описание проекта
-Данный проект - последний спринт перед дипломом
+## Project description
+This project is the last before diploma project
 
-## Проект включает в себя:
+## Project includes in itself:
 
 + FrontEnd
 + BackEnd
 
-## Ссылка на веб-приложение:
+## Web-application link:
 https://asidaras.mesto.nomoredomains.club
