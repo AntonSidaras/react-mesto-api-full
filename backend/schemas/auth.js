@@ -14,8 +14,8 @@ module.exports.signUpSchema = celebrate({
   [Segments.BODY]: Joi.object().keys({
     email: Joi.string().email().required(),
     password: Joi.string().required(),
-    name: Joi.string().default('Жак-Ив Кусто'),
-    about: Joi.string().default('Исследователь'),
-    avatar: Joi.string().default('https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png'),
+    name: Joi.string().default('Как вас зовут?'),
+    about: Joi.string().default('Информация о вас'),
+    avatar: Joi.string().default('https://techmesse.com/img/anonymous.jpg'),
   }),
 });
