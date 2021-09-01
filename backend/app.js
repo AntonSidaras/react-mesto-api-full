@@ -2,6 +2,7 @@ const { PORT = 3000 } = process.env;
 
 require('dotenv').config();
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
 const cors = require('cors');
@@ -18,6 +19,12 @@ const allowedOrigins = ['http://localhost:3000',
 const atlasURI = `mongodb+srv://${ATLAS_USER}:${ATLAS_SECRET}@asidarascluster.k86db.mongodb.net/mesto?retryWrites=true&w=majority`;
 const app = express();
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // за 15 минут
+  max: 100, // можно совершить максимум 100 запросов с одного IP
+});
+
+app.use(limiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
