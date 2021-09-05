@@ -1,5 +1,3 @@
-const { PORT = 3000 } = process.env;
-
 require('dotenv').config();
 const express = require('express');
 const rateLimit = require('express-rate-limit');
@@ -12,19 +10,22 @@ const { login, createUser } = require('./controllers/users');
 const { signInSchema, signUpSchema } = require('./schemas/auth');
 const NotFound = require('./errors/not-found');
 
-const { NODE_ENV, ATLAS_USER, ATLAS_SECRET } = process.env;
+const {
+  PORT = 3000, NODE_ENV, ATLAS_USER, ATLAS_SECRET,
+} = process.env;
+
 const allowedOrigins = ['http://localhost:3000',
   'http://asidaras.mesto.nomoredomains.club',
   'https://asidaras.mesto.nomoredomains.club'];
+
 const atlasURI = `mongodb+srv://${ATLAS_USER}:${ATLAS_SECRET}@asidarascluster.k86db.mongodb.net/mesto?retryWrites=true&w=majority`;
-const app = express();
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // за 15 минут
   max: 100, // можно совершить максимум 100 запросов с одного IP
 });
 
-app.use(limiter);
+const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -41,6 +42,7 @@ mongoose.connect(NODE_ENV === 'production' ? atlasURI : 'mongodb://localhost:270
 
 app.use(requestLogger);
 
+app.use(limiter);
 app.use(cors({
   origin(origin, callback) {
     // allow requests with no origin
@@ -53,12 +55,6 @@ app.use(cors({
     return callback(null, true);
   },
 }));
-
-app.get('/crash-test', () => {
-  setTimeout(() => {
-    throw new Error('Сервер сейчас упадёт');
-  }, 0);
-});
 
 app.post('/signin', signInSchema, login);
 app.post('/signup', signUpSchema, createUser);

@@ -80,6 +80,7 @@ function App() {
     setJWT("");
     setIsLoggedIn(value);
     closeAllPopups();
+    setCurrentUser({name: "Идёт загрузка...", avatar: onLoadImage, about: "", email: "example@example.com", _id: 0});
   }
 
   function handleCardDelete(card){
