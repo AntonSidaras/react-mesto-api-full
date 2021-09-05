@@ -15,35 +15,30 @@ import ImagePopup from "./ImagePopup";
 import Loader from "./Loader";
 import PageNotFound from "./PageNotFound";
 import Api from '../utils/api';
+import * as Constants from '../utils/constants';
 import onLoadImage from "../images/profile/Card-load.gif"
-import onSuccessAuth from "../images/popup/ok.svg"
-import onFailureAuth from "../images/popup/fail.svg"
 import {CurrentUserContext} from '../contexts/CurrentUserContext';
 
 function App() {
-
-  const buttonCaptionDefault = {add: "Создать", delete: "Да", others: "Сохранить"};
-  const toolTipDataFail = {image: onFailureAuth, text:"Что-то пошло не так! Попробуйте ещё раз."};
-  const toolTipDataSuccess = {image: onSuccessAuth, text:"Вы успешно зарегистрировались!"};
 
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [jwt, setJWT] = React.useState(null);
 
   const [isInfoTooltipPopupOpen, setisInfoTooltipPopupOpen] = React.useState(false);
-  const [toolTipData, setToolTipData] = React.useState(toolTipDataFail);
+  const [toolTipData, setToolTipData] = React.useState(Constants.TOOL_TIP_DATA_FAIL);
   const [isEditProfilePopupOpen, setEditProfilePopupOpen] = React.useState(false);
   const [isAddPlacePopupOpen, setAddPlacePopupOpen] = React.useState(false);
   const [isEditAvatarPopupOpen, setEditAvatarPopupOpen] = React.useState(false);
   const [isLoaderVisible, setLoaderVisible] = React.useState(true);
   const [selectedCard, setSelectedCard] = React.useState(null);
   const [cardToDelete, setCardToDelete] = React.useState(null);
-  const [buttonCaption, setButtonCaption] = React.useState(buttonCaptionDefault);
-  const [currentUser, setCurrentUser] = React.useState({name: "Идёт загрузка...", avatar: onLoadImage, about: "", email: "example@example.com", _id: 0});
+  const [buttonCaption, setButtonCaption] = React.useState(Constants.DEFAULT_BUTTON_CAPTION);
+  const [currentUser, setCurrentUser] = React.useState(Constants.DEFAULT_USER);
   const [cards, setCards] = React.useState([]);
 
   React.useEffect(() => {
 
-    setJWT(localStorage.getItem('token'));
+    setJWT(localStorage.getItem(Constants.TOKEN_STRING_KEY));
 
     Api.checkUser(jwt)
     .then((user) => {
@@ -76,11 +71,11 @@ function App() {
   }
 
   function onSignOut(value){
-    localStorage.removeItem('token');
+    localStorage.removeItem(Constants.TOKEN_STRING_KEY);
     setJWT("");
     setIsLoggedIn(value);
     closeAllPopups();
-    setCurrentUser({name: "Идёт загрузка...", avatar: onLoadImage, about: "", email: "example@example.com", _id: 0});
+    setCurrentUser(Constants.DEFAULT_USER);
   }
 
   function handleCardDelete(card){
@@ -136,7 +131,7 @@ function App() {
   }
 
   function handleUpdateUser({name, about}){
-    setButtonCaption({add: "Создать", delete: "Да", others: "Сохранение..."});
+    setButtonCaption(Constants.BUTTON_CAPTION_UPDATE_USER_AVATAR);
     Api.setUserInfo(jwt, {
       newName: name, 
       newAbout: about
@@ -149,12 +144,12 @@ function App() {
       alert(error);
     })
     .finally(()=>{
-      setButtonCaption(buttonCaptionDefault);
+      setButtonCaption(Constants.DEFAULT_BUTTON_CAPTION);
     });
   }
 
   function handleUpdateAvatar({avatar}){
-    setButtonCaption({add: "Создать", delete: "Да", others: "Сохранение..."});
+    setButtonCaption(Constants.BUTTON_CAPTION_UPDATE_USER_AVATAR);
     Api.setUserAvatar(jwt, avatar)
     .then((result) => {
       setCurrentUser(result);
@@ -164,12 +159,12 @@ function App() {
       alert(error);
     })
     .finally(()=>{
-      setButtonCaption(buttonCaptionDefault);
+      setButtonCaption(Constants.DEFAULT_BUTTON_CAPTION);
     });
   }
 
   function handleAddPlaceSubmit({title, link}){
-    setButtonCaption({add: "Сохранение...", delete: "Да", others: "Сохранить"});
+    setButtonCaption(Constants.BUTTON_CAPTION_ADD_CARD);
     Api.createNewCard(jwt, {
       newTitle: title,
       newLink: link
@@ -182,12 +177,12 @@ function App() {
       alert(error);
     })
     .finally(() => {
-      setButtonCaption(buttonCaptionDefault);
+      setButtonCaption(Constants.DEFAULT_BUTTON_CAPTION);
     });
   }
 
   function handleDelete(card){
-    setButtonCaption({add: "Создать", delete: "Удаление...", others: "Сохранить"});
+    setButtonCaption(Constants.BUTTON_CAPTION_DELETE_CARD);
     Api.removeCard(jwt, card._id)
     .then(() => {
       setCards((state) => state.filter(c => c._id !== card._id));
@@ -197,7 +192,7 @@ function App() {
       alert(error);
     })
     .finally(()=>{
-      setButtonCaption(buttonCaptionDefault);
+      setButtonCaption(Constants.DEFAULT_BUTTON_CAPTION);
     });
   }
 
@@ -207,13 +202,13 @@ function App() {
       password: password
     })
     .then((response) => {
-      localStorage.setItem('token', response.token);
+      localStorage.setItem(Constants.TOKEN_STRING_KEY, response.token);
       setJWT(response.token);
       toggleLogin();
       loadPage(jwt);
     })
     .catch(() => {
-      setToolTipData(toolTipDataFail);
+      setToolTipData(Constants.TOOL_TIP_DATA_FAIL);
       setisInfoTooltipPopupOpen(true);
     });
   }
@@ -224,11 +219,11 @@ function App() {
       password: password
     })
     .then(() => {
-      setToolTipData(toolTipDataSuccess);
+      setToolTipData(Constants.TOOL_TIP_DATA_SUCCESS);
       setisInfoTooltipPopupOpen(true);
     })
     .catch(() => {
-      setToolTipData(toolTipDataFail);
+      setToolTipData(Constants.TOOL_TIP_DATA_FAIL);
       setisInfoTooltipPopupOpen(true);
     });
   }
@@ -238,62 +233,62 @@ function App() {
       <div className="page page__content">
         <CurrentUserContext.Provider value={{currentUser: currentUser, isloggedIn: isLoggedIn, handleLogin: toggleLogin}}>
           <ProtectedRoute 
-            exact path='/' component={Header} data={{showEmail: true, text: "", link: "", button: "Выйти"}} onSignOut={toggleLogin}
+            exact path={Constants.ROUTE_ROOT} component={Header} data={Constants.HEADER_AUTHORIZED} onSignOut={toggleLogin}
           />
           <ProtectedRoute 
-            exact path='/' component={Main}
+            exact path={Constants.ROUTE_ROOT} component={Main}
             cards={cards} onCardLike={handleCardLike} onCardDelete={handleCardDelete}
             onEditAvatar={handleEditAvatarClick} onEditProfile={handleEditProfileClick} 
             onAddPlace={handleAddPlaceClick} onCardClick={handleCardClick}
           />
           <ProtectedRoute 
-            exact path='/' component={EditProfilePopup}
+            exact path={Constants.ROUTE_ROOT} component={EditProfilePopup}
             isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} 
             onUpdateUser={handleUpdateUser} buttonCaption={buttonCaption}
           />
           <ProtectedRoute 
-            exact path='/' component={AddPlacePopup}
+            exact path={Constants.ROUTE_ROOT} component={AddPlacePopup}
             isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} 
             onAddPlace={handleAddPlaceSubmit} buttonCaption={buttonCaption}
           />
           <ProtectedRoute 
-            exact path='/' component={EditAvatarPopup}
+            exact path={Constants.ROUTE_ROOT} component={EditAvatarPopup}
             isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} 
             onUpdateAvatar={handleUpdateAvatar} buttonCaption={buttonCaption}
           />
           <ProtectedRoute 
-            exact path='/' component={DeleteConfirmPopup}
+            exact path={Constants.ROUTE_ROOT} component={DeleteConfirmPopup}
             card={cardToDelete} onClose={closeAllPopups} 
             onDelete={handleDelete} buttonCaption={buttonCaption}
           />
           <ProtectedRoute 
-            exact path='/' component={ImagePopup}
+            exact path={Constants.ROUTE_ROOT} component={ImagePopup}
             card={selectedCard} onClose={closeAllPopups}
           />
           <ProtectedRoute 
-            exact path='/' component={Loader}
+            exact path={Constants.ROUTE_ROOT} component={Loader}
             isVisible={isLoaderVisible} image={onLoadImage}
           />
           <ProtectedRoute 
-            exact path='/' component={Footer}
+            exact path={Constants.ROUTE_ROOT} component={Footer}
           />
           <Switch>
-            <Route exact path="/sign-in">
-              {isLoggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
-              <Header data={{showEmail: false, text:"Регистрация", link: "/sign-up", button: ""}}/>
+            <Route exact path={Constants.ROUTE_SIGN_IN}>
+              {isLoggedIn ? <Redirect to={Constants.ROUTE_ROOT} /> : <Redirect to={Constants.ROUTE_SIGN_IN} />}
+              <Header data={Constants.HEADER_LINK_TO_SIGN_UP}/>
               <Login onLogin={onLogin}/>
               <InfoTooltip isOpen={isInfoTooltipPopupOpen} data={toolTipData} onClose={closeAllPopups}/>
             </Route>
-            <Route exact path="/sign-up">
-              {isLoggedIn ? <Redirect to="/" /> : <Redirect to="/sign-up" />}
-              <Header data={{showEmail: false, text:"Войти", link: "/sign-in", button: ""}}/>
+            <Route exact path={Constants.ROUTE_SIGN_UP}>
+              {isLoggedIn ? <Redirect to={Constants.ROUTE_ROOT} /> : <Redirect to={Constants.ROUTE_SIGN_UP} />}
+              <Header data={Constants.HEADER_LINK_TO_SIGN_IN}/>
               <Register onRegister={onRegister}/>
               <InfoTooltip isOpen={isInfoTooltipPopupOpen} data={toolTipData} onClose={closeAllPopups}/>
             </Route>
-            <Route exact path="/">
-              {isLoggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
+            <Route exact path={Constants.ROUTE_ROOT}>
+              {isLoggedIn ? <Redirect to={Constants.ROUTE_ROOT} /> : <Redirect to={Constants.ROUTE_SIGN_IN} />}
             </Route>
-            <Route path="*">
+            <Route path={Constants.ROUTE_ANY}>
               <PageNotFound />
             </Route>
           </Switch>
