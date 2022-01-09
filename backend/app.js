@@ -14,9 +14,11 @@ const {
   PORT = 3100, NODE_ENV, ATLAS_USER, ATLAS_SECRET,
 } = process.env;
 
-const allowedOrigins = ['http://localhost:3000',
+const allowedOrigins = [
   'http://asidaras.mesto.nomoredomains.club',
-  'https://asidaras.mesto.nomoredomains.club'];
+  'https://asidaras.mesto.nomoredomains.club',
+  'http://mesto.asidaras.ru',
+  'https://mesto.asidaras.ru'];
 
 const atlasURI = `mongodb+srv://${ATLAS_USER}:${ATLAS_SECRET}@asidarascluster.k86db.mongodb.net/mesto?retryWrites=true&w=majority`;
 
