@@ -11,7 +11,7 @@ const { signInSchema, signUpSchema } = require('./schemas/auth');
 const NotFound = require('./errors/not-found');
 
 const {
-  PORT = 3000, NODE_ENV, ATLAS_USER, ATLAS_SECRET,
+  PORT = 3100, NODE_ENV, ATLAS_USER, ATLAS_SECRET,
 } = process.env;
 
 const allowedOrigins = ['http://localhost:3000',
@@ -84,4 +84,4 @@ app.use((err, req, res, next) => {
     });
 });
 
-app.listen(PORT, () => {});
+app.listen(PORT, () => { });
