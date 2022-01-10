@@ -145,7 +145,7 @@ class Api {
 }
 
 export default new Api({
-  server: "https://api.movies.asidaras.ru", handleResponse: (res) => {
+  server: "https://api.mesto.asidaras.ru", handleResponse: (res) => {
     if (!res.ok) {
       return Promise.reject(`Ошибка: ${res.status}`);
     }
