@@ -9,4 +9,4 @@ This project is the last before diploma project
 + BackEnd
 
 ## Web-application link:
-https://asidaras.mesto.nomoredomains.club
+https://mesto.asidaras.ru
